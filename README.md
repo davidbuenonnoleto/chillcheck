@@ -118,6 +118,10 @@ managed by `make pg-up` / `make pg-down` / `make pg-nuke` and documented in
 - **Compliance PDF** — every reading in a date range with safe ranges and pass/fail, a
   **Deviations & corrective actions** section, and a record-integrity line ("VERIFIED — N
   readings, hash chain intact") — the part an inspector actually scrutinizes.
+- **Analytics** — an org-wide dashboard (with a location filter and 7/30/90-day ranges)
+  showing % of readings in range, deviations, overdue events, and undocumented deviations,
+  a daily in-range trend chart, and a per-unit breakdown (avg/min/max temp, last reading)
+  that exports to CSV.
 
 ## Engineering decisions (deliberate)
 
@@ -184,7 +188,7 @@ single-use and expire in an hour. Alert, invite, and reset emails all go through
 
 ## Roadmap
 
-- Usage analytics, native mobile.
+- Native mobile.
 
 ## Note on temperature thresholds
 

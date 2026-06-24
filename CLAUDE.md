@@ -9,9 +9,9 @@ paper temperature-log clipboards and produces inspection-ready PDF compliance re
 This codebase is the full system: accounts with team invites and password reset, locations,
 units, manual logging, a live status board, and PDF export (1–3); a standalone Go BLE
 **gateway agent** for automatic sensor readings and an in-process **alert engine** (4–6);
-and **Stripe billing** with per-location pricing and an onboarding checklist (7+). Remaining
-roadmap: usage analytics, native mobile. See `ARCHITECTURE.md` for the full picture before
-changing how the pieces fit together.
+and **Stripe billing** with per-location pricing and an onboarding checklist (7+); plus an
+org-wide **usage-analytics** dashboard. Remaining roadmap: native mobile. See
+`ARCHITECTURE.md` for the full picture before changing how the pieces fit together.
 
 ## Working agreement (read this)
 
@@ -256,7 +256,7 @@ A unit's status on the board:
 
 ## Roadmap (not built yet)
 
-- Usage analytics, native mobile.
+- Native mobile.
 
 ## Caveats
 
