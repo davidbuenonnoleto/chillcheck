@@ -50,6 +50,30 @@ Open http://localhost:5173, create an account, add a location, add a unit
 (fridge / freezer / hot-hold), and start logging temperatures. "Export report"
 produces the compliance PDF.
 
+### Run locally without Docker
+
+No Docker (or no sudo)? Use the rootless Postgres helper, which downloads and runs a
+private Postgres under your home dir on port **5433** and loads the schema for you. It
+replaces steps 1–2 above; point the backend's `DATABASE_URL` at it and run the frontend
+unchanged:
+
+```bash
+# 1+2. Rootless Postgres on :5433, schema loaded (downloads on first run)
+make pg-up
+
+# 3. Backend  ->  http://localhost:8080
+cd backend && cp .env.example .env && go mod tidy
+DATABASE_URL="postgres://chillcheck:chillcheck@localhost:5433/chillcheck?sslmode=disable" \
+  go run ./cmd/api
+
+# 4. Frontend  ->  http://localhost:5173   (new terminal, same as above)
+cd frontend && cp .env.example .env && npm install && npm run dev
+```
+
+Seed demo data the same way: `cd backend && DATABASE_URL="…localhost:5433…" go run ./cmd/seed`.
+Stop it with `make pg-down` (keeps data) or `make pg-nuke` (deletes everything). See
+`backend/db/rootless-postgres.md` for details.
+
 ### Demo data (optional)
 
 To skip manual setup and see a populated board, run the seeder after the schema is
