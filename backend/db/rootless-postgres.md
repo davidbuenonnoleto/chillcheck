@@ -13,6 +13,15 @@ private server on **port 5433**.
 
 ## Quick start
 
+From the repo root, the Make targets wrap the script:
+
+```bash
+make test-integration   # start Postgres (downloads on first run) + run all backend tests
+make pg-down            # stop the server when done (state is kept for reuse)
+```
+
+Or call the script directly:
+
 ```bash
 backend/db/rootless-postgres.sh start          # download (first run), init, start, load schema
 cd backend && TEST_DATABASE_URL="$(db/rootless-postgres.sh dsn)" go test ./...
