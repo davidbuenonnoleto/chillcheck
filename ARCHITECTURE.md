@@ -115,6 +115,21 @@ unset, billing is disabled and entitlement is always true. Pricing is **per loca
 (subscription quantity = location count, synced on location creation), and only **admins**
 can start checkout or open the portal.
 
+### 3e. Analytics
+
+The analytics dashboard is read-only and org-scoped. A single query, `store.Analytics`,
+computes everything for the window from `readings` + `alerts`:
+
+```
+browser → GET /api/analytics?from&to&location_id (JWT) → store.Analytics → { KPIs, daily trend, per-unit rows }
+        → GET /api/analytics/export.csv → the per-unit breakdown as a CSV download
+```
+
+Compliance = **% of readings in range** (counted in SQL, no interpolation). `location_id`
+is optional (nil = whole org) and validated against the caller's org. Like other reads it is
+**never billing-gated**. The CSV is fetched as a blob with the auth header (the JWT is a
+header, not a cookie) and named from the server's `Content-Disposition`.
+
 ## 4. Authentication (two realms)
 
 The API serves two kinds of caller, with separate middleware:
@@ -268,4 +283,4 @@ connection-exhaustion trap and keeps the alert-engine goroutine simple.
   PDF can open as a plain link instead of a header-carrying blob fetch.
 - **Health-code thresholds vary** by state/local authority; the default safe ranges are
   starting points, set per unit by operators — not legal guidance.
-- **Next:** usage analytics, native mobile.
+- **Next:** native mobile.
