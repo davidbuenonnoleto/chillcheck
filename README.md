@@ -16,14 +16,16 @@ pieces fit together.
 - **Database:** PostgreSQL
 - **Built to deploy on:** AWS App Runner (API) + RDS Postgres + Amplify Hosting (frontend)
 
+**Deploying to AWS?** See [DEPLOYMENT.md](DEPLOYMENT.md) — a step-by-step, explain-the-why runbook.
+
 The frontend type-checks and production-builds, and the Go backend and gateway both compile
-and `go vet` clean (Go 1.23+, verified on Go 1.26). `go.mod`/`go.sum` are committed, so a
+and `go vet` clean (Go 1.26+). `go.mod`/`go.sum` are committed, so a
 plain `go build ./...` works after the first module download. There's a unit + integration
 test suite — see **Tests** below.
 
 ## Run locally
 
-Prerequisites: Docker, Go 1.23+, Node 20.19+ (or 22.12+) — required by Vite 8.
+Prerequisites: Docker, Go 1.26+, Node 20.19+ (or 22.12+) — required by Vite 8.
 
 ```bash
 # 1. Start Postgres
