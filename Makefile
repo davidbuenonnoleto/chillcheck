@@ -1,4 +1,6 @@
 # ChillCheck developer tasks. Run `make help` for the list.
+# Run all targets from the repo root — paths here are relative to it, so
+# `make` from a subdirectory fails with "No rule to make target".
 PG := backend/db/rootless-postgres.sh
 
 .PHONY: help pg-up pg-dsn pg-down pg-nuke test test-integration
