@@ -72,19 +72,30 @@ the seeder resets the demo data.
 
 ## Tests
 
+From the repo root (Make targets must run from there):
+
 ```bash
-cd backend
-go test ./...        # unit: reading hash chain, ComputeStatus, auth rate limiter
+make test               # unit: reading hash chain, ComputeStatus, auth rate limiter (no database)
+make test-integration   # spin up a database, then run all backend tests incl. DB-gated ones
 ```
 
-Integration tests exercise the tamper-evident hash chain (insert → tamper → detect) and the
-alert-engine leader lock against a **real Postgres**. They're gated behind `TEST_DATABASE_URL`
-and skip when it's unset, so `go test ./...` stays green without a database:
+`make test` is just `cd backend && go test ./...`.
+
+Integration tests exercise the tamper-evident hash chain (insert → tamper → detect), the
+alert-engine leader lock, and the analytics rollup against a **real Postgres**. They're gated
+behind `TEST_DATABASE_URL` and skip when it's unset, so `go test ./...` stays green without a
+database:
 
 ```bash
 TEST_DATABASE_URL="postgres://chillcheck:chillcheck@localhost:5432/chillcheck?sslmode=disable" \
   go test ./internal/store/ -run Integration -v
 ```
+
+`make test-integration` provides that Postgres for you. With Docker, point it at
+`docker compose up -d`. With **no Docker and no sudo**, it falls back to a rootless Postgres
+(downloaded and run entirely under your home dir) via `backend/db/rootless-postgres.sh` —
+managed by `make pg-up` / `make pg-down` / `make pg-nuke` and documented in
+`backend/db/rootless-postgres.md`. Run `make help` for all targets.
 
 ## What's in it
 
