@@ -82,7 +82,10 @@ cd frontend && npm install && npm run dev
   without confirming it belongs to the caller's org.
 - **Deploy target:** Go API as a container on **AWS App Runner** (not Lambda — avoids the
   Postgres connection-exhaustion trap), RDS/Aurora Postgres, React on Amplify Hosting.
-  The `Dockerfile` already builds a small static image suitable for App Runner/ECS.
+  The `Dockerfile` already builds a small static image suitable for App Runner/ECS. The full
+  first-deploy runbook (App Runner + RDS + Amplify + SES + Stripe + Pi gateway, with the
+  reasoning behind each choice) is `DEPLOYMENT.md`; its design spec + plan live under
+  `docs/superpowers/`. Not yet executed — nothing is in AWS.
 
 ## Conventions
 
