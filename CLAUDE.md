@@ -254,6 +254,30 @@ A unit's status on the board:
   `TeamPage.tsx`, `AcceptInvitePage.tsx`, `ForgotPasswordPage.tsx`, `ResetPasswordPage.tsx`;
   `AuthContext.adoptToken` logs a user in from the invite-accept token.
 
+## Usage analytics (built)
+
+- Org-wide dashboard at `/analytics` (header nav link), with a **location filter** and
+  7/30/90-day range presets (default 30). Read-only — `requireAuth` only, **never
+  billing-gated** (it's a read/export view; same rule as logging/exports).
+- **Compliance = % of readings in range** — `temp_f` between the unit's own
+  `min_temp_f`/`max_temp_f`, counted in SQL with no interpolation (exact, inspector-
+  explainable). Don't silently switch to a time-weighted metric without saying so.
+- One store call, `store.Analytics(ctx, orgID, from, to, locationID *uuid.UUID)`
+  (`internal/store/analytics.go`), org-scoped; `locationID` nil = whole org, validated
+  against the org otherwise. Returns org KPIs (in-range %, total readings, deviations,
+  overdue events, undocumented deviations), a **daily UTC in-range trend**, and a
+  **per-unit** breakdown (in-range %, deviations, observed avg/min/max temp, last reading).
+- Deviations come from the **alerts** table (opened in window); `overdue_events` are
+  `overdue`-kind alerts; `undocumented_deviations` are `out_of_range` alerts with no
+  corrective action. Pure helpers `pct` (empty denominator → 0) and `buildTrend` (fills
+  empty days) are unit-tested; the SQL has a `TEST_DATABASE_URL`-gated integration test.
+- Endpoints: `GET /api/analytics` (JSON) and `GET /api/analytics/export.csv` (per-unit CSV).
+- Caveat: trend buckets are **UTC** days for now; per-location-timezone bucketing is a
+  later refinement. Spec: `docs/superpowers/specs/2026-06-23-usage-analytics-design.md`.
+- Frontend: `AnalyticsPage.tsx`, `useAnalytics`, and a lazy `AnalyticsTrendChart`
+  (recharts kept out of the main bundle, same split as `TempTrendChart`). The CSV button
+  fetches a blob with the auth header (JWT is in a header, not a cookie) — not a plain link.
+
 ## Roadmap (not built yet)
 
 - Native mobile.
