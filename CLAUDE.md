@@ -124,6 +124,8 @@ cd frontend && cp .env.example .env && npm install && npm run dev
   Postgres and are gated behind `TEST_DATABASE_URL` — they `t.Skip` when it's unset, so the
   default `go test ./...` needs no database. They prove the hash chain detects edits/deletes
   and that `WithLeaderLock` serializes. Keep new DB-backed tests behind the same env gate.
+  Get a Postgres via `docker compose up -d`; with no Docker/sudo, use the rootless recipe
+  `backend/db/rootless-postgres.sh start` (see `backend/db/rootless-postgres.md`).
 - No frontend test runner is set up yet; the gate is `tsc -b && vite build` (`npm run build`).
 
 ## Status model
