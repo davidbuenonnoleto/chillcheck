@@ -53,6 +53,7 @@ func (s *Server) Router() http.Handler {
 		AllowedOrigins:   []string{s.cfg.CORSOrigin},
 		AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		ExposedHeaders:   []string{"Content-Disposition"}, // so the browser can read the CSV download filename
 		AllowCredentials: false,
 	}))
 

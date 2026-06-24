@@ -52,11 +52,11 @@ export function AnalyticsPage() {
   async function exportCsv() {
     setExporting(true);
     try {
-      const blob = await fetchAnalyticsCsv(from, undefined, locationId);
+      const { blob, filename } = await fetchAnalyticsCsv(from, undefined, locationId);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `analytics-${from}.csv`;
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {

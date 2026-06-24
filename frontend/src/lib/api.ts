@@ -315,12 +315,18 @@ export async function fetchReportBlob(locationId: string, from: string, to: stri
 }
 
 // The JWT lives in a header, not a cookie, so we can't use a plain download link —
-// fetch the CSV as a blob with the auth header (see AnalyticsPage).
-export async function fetchAnalyticsCsv(from?: string, to?: string, locationId?: string): Promise<Blob> {
+// fetch the CSV as a blob with the auth header (see AnalyticsPage). The filename
+// comes from the server's Content-Disposition so it matches a direct download.
+export async function fetchAnalyticsCsv(
+  from?: string,
+  to?: string,
+  locationId?: string,
+): Promise<{ blob: Blob; filename: string }> {
   const token = getToken();
   const res = await fetch(api.analyticsCsvPath(from, to, locationId), {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   if (!res.ok) throw new ApiError(res.status, "Could not export the CSV.");
-  return res.blob();
+  const match = /filename="?([^"]+)"?/.exec(res.headers.get("Content-Disposition") ?? "");
+  return { blob: await res.blob(), filename: match?.[1] ?? `analytics-${from ?? "export"}.csv` };
 }
