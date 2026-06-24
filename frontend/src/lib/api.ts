@@ -127,31 +127,45 @@ export interface LocationStatus {
   location: Location;
   units: UnitStatus[];
 }
-export interface LocationStat {
-  location_id: string;
+export interface TrendBucket {
+  date: string; // YYYY-MM-DD (UTC)
+  in_range: number;
+  total: number;
+  pct: number;
+}
+export interface UnitStat {
+  unit_id: string;
+  unit_name: string;
   location_name: string;
-  units: number;
-  readings: number;
-  expected_logs: number;
-  compliance_pct: number;
-  out_of_range: number;
+  total_readings: number;
+  in_range_pct: number;
   deviations: number;
-  documented_deviations: number;
+  avg_temp_f: number | null;
+  min_temp_f: number | null;
+  max_temp_f: number | null;
+  last_reading_at: string | null;
 }
 export interface Analytics {
   from: string;
   to: string;
-  locations: LocationStat[];
-  readings: number;
-  expected_logs: number;
-  compliance_pct: number;
-  out_of_range: number;
+  total_readings: number;
+  in_range_pct: number;
   deviations: number;
-  documented_deviations: number;
-  documentation_pct: number;
+  overdue_events: number;
+  undocumented_deviations: number;
+  trend: TrendBucket[];
+  units: UnitStat[];
 }
 
 // ---- core request helper ----
+
+function analyticsQuery(from?: string, to?: string, locationId?: string): string {
+  const q = new URLSearchParams();
+  if (from) q.set("from", from);
+  if (to) q.set("to", to);
+  if (locationId) q.set("location_id", locationId);
+  return q.toString();
+}
 
 export class ApiError extends Error {
   status: number;
@@ -263,12 +277,14 @@ export const api = {
 
   getIntegrity: () => request<ChainStatus>("/api/integrity"),
 
-  getAnalytics: (from?: string, to?: string) => {
-    const q = new URLSearchParams();
-    if (from) q.set("from", from);
-    if (to) q.set("to", to);
-    const qs = q.toString();
-    return request<Analytics>(`/api/analytics${qs ? `?${qs}` : ""}`);
+  getAnalytics: (from?: string, to?: string, locationId?: string) => {
+    const q = analyticsQuery(from, to, locationId);
+    return request<Analytics>(`/api/analytics${q ? `?${q}` : ""}`);
+  },
+
+  analyticsCsvPath: (from?: string, to?: string, locationId?: string) => {
+    const q = analyticsQuery(from, to, locationId);
+    return `${BASE}/api/analytics/export.csv${q ? `?${q}` : ""}`;
   },
 
   createReading: (body: { unit_id: string; temp_f: number; note?: string }) =>
@@ -295,5 +311,16 @@ export async function fetchReportBlob(locationId: string, from: string, to: stri
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   if (!res.ok) throw new ApiError(res.status, "Could not generate the report.");
+  return res.blob();
+}
+
+// The JWT lives in a header, not a cookie, so we can't use a plain download link —
+// fetch the CSV as a blob with the auth header (see AnalyticsPage).
+export async function fetchAnalyticsCsv(from?: string, to?: string, locationId?: string): Promise<Blob> {
+  const token = getToken();
+  const res = await fetch(api.analyticsCsvPath(from, to, locationId), {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, "Could not export the CSV.");
   return res.blob();
 }

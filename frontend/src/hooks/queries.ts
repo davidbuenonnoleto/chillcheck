@@ -5,10 +5,10 @@ export function useLocations() {
   return useQuery({ queryKey: ["locations"], queryFn: api.listLocations });
 }
 
-export function useAnalytics(from?: string, to?: string) {
+export function useAnalytics(from?: string, to?: string, locationId?: string) {
   return useQuery({
-    queryKey: ["analytics", from, to],
-    queryFn: () => api.getAnalytics(from, to),
+    queryKey: ["analytics", from, to, locationId],
+    queryFn: () => api.getAnalytics(from, to, locationId),
   });
 }
 

@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Activity, AlertTriangle, ClipboardCheck } from "lucide-react";
-import { useAnalytics } from "@/hooks/queries";
+import { toast } from "sonner";
+import { ArrowLeft, Activity, AlertTriangle, ClipboardList, Download, FileWarning, Thermometer } from "lucide-react";
+import { useAnalytics, useLocations } from "@/hooks/queries";
+import { fetchAnalyticsCsv } from "@/lib/api";
+import { fmtTemp } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -12,6 +16,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AnalyticsTrendChart } from "@/components/AnalyticsTrendChart";
+
+const ALL = "all";
 
 function fromDays(days: number): string {
   return new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
@@ -23,9 +30,41 @@ function pctColor(p: number): string {
   return "text-destructive";
 }
 
+function temp(v: number | null): string {
+  return v == null ? "—" : fmtTemp(v);
+}
+
+function fmtDate(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
 export function AnalyticsPage() {
-  const [days, setDays] = useState("7");
-  const { data, isLoading } = useAnalytics(fromDays(Number(days)));
+  const [days, setDays] = useState("30");
+  const [location, setLocation] = useState(ALL);
+  const [exporting, setExporting] = useState(false);
+
+  const from = fromDays(Number(days));
+  const locationId = location === ALL ? undefined : location;
+  const { data, isLoading } = useAnalytics(from, undefined, locationId);
+  const { data: locations } = useLocations();
+
+  async function exportCsv() {
+    setExporting(true);
+    try {
+      const blob = await fetchAnalyticsCsv(from, undefined, locationId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `analytics-${from}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not export the CSV.");
+    } finally {
+      setExporting(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -34,87 +73,124 @@ export function AnalyticsPage() {
         Back
       </Link>
 
-      <div className="flex items-end justify-between">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Analytics</h1>
           <p className="text-sm text-muted-foreground">Compliance across your locations.</p>
         </div>
-        <Select value={days} onValueChange={setDays}>
-          <SelectTrigger className="w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7">Last 7 days</SelectItem>
-            <SelectItem value="30">Last 30 days</SelectItem>
-            <SelectItem value="90">Last 90 days</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={location} onValueChange={setLocation}>
+            <SelectTrigger className="w-44">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All locations</SelectItem>
+              {locations?.map((l) => (
+                <SelectItem key={l.id} value={l.id}>
+                  {l.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={days} onValueChange={setDays}>
+            <SelectTrigger className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+              <SelectItem value="90">Last 90 days</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" onClick={exportCsv} disabled={exporting || !data}>
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">{exporting ? "Exporting..." : "Export CSV"}</span>
+          </Button>
+        </div>
       </div>
 
       {isLoading && <p className="text-sm text-muted-foreground">Loading...</p>}
 
       {data && (
         <>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <SummaryCard
               icon={<Activity className="h-5 w-5 text-primary" />}
-              label="Logging compliance"
-              value={`${data.compliance_pct}%`}
-              sub={`${data.readings} of ~${data.expected_logs} expected logs`}
-              valueClass={pctColor(data.compliance_pct)}
-            />
-            <SummaryCard
-              icon={<ClipboardCheck className="h-5 w-5 text-primary" />}
-              label="Deviations documented"
-              value={`${data.documentation_pct}%`}
-              sub={`${data.documented_deviations} of ${data.deviations} deviations`}
-              valueClass={pctColor(data.documentation_pct)}
+              label="Readings in range"
+              value={`${data.in_range_pct}%`}
+              sub={`${data.total_readings} readings logged`}
+              valueClass={pctColor(data.in_range_pct)}
             />
             <SummaryCard
               icon={<AlertTriangle className="h-5 w-5 text-primary" />}
-              label="Out-of-range readings"
-              value={`${data.out_of_range}`}
-              sub={`across ${data.locations.length} location${data.locations.length === 1 ? "" : "s"}`}
+              label="Deviations"
+              value={`${data.deviations}`}
+              sub={`${data.overdue_events} overdue event${data.overdue_events === 1 ? "" : "s"}`}
+            />
+            <SummaryCard
+              icon={<FileWarning className="h-5 w-5 text-primary" />}
+              label="Undocumented"
+              value={`${data.undocumented_deviations}`}
+              sub="out-of-range, no action logged"
+              valueClass={data.undocumented_deviations > 0 ? "text-destructive" : "text-ok"}
+            />
+            <SummaryCard
+              icon={<Thermometer className="h-5 w-5 text-primary" />}
+              label="Units monitored"
+              value={`${data.units.length}`}
+              sub="in this view"
             />
           </div>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">By location</CardTitle>
+              <CardTitle className="text-base">In-range trend</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AnalyticsTrendChart data={data.trend} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <ClipboardList className="h-4 w-4" />
+                By unit
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Unit</TableHead>
                     <TableHead>Location</TableHead>
-                    <TableHead className="text-right">Units</TableHead>
-                    <TableHead className="text-right">Logged / expected</TableHead>
-                    <TableHead className="text-right">Compliance</TableHead>
-                    <TableHead className="text-right">Out of range</TableHead>
+                    <TableHead className="text-right">Readings</TableHead>
+                    <TableHead className="text-right">In range</TableHead>
                     <TableHead className="text-right">Deviations</TableHead>
+                    <TableHead className="text-right">Avg / Min / Max</TableHead>
+                    <TableHead className="text-right">Last reading</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.locations.map((l) => (
-                    <TableRow key={l.location_id}>
-                      <TableCell className="font-medium">{l.location_name}</TableCell>
-                      <TableCell className="text-right">{l.units}</TableCell>
-                      <TableCell className="text-right">
-                        {l.readings} / ~{l.expected_logs}
+                  {data.units.map((u) => (
+                    <TableRow key={u.unit_id}>
+                      <TableCell className="font-medium">{u.unit_name}</TableCell>
+                      <TableCell className="text-muted-foreground">{u.location_name}</TableCell>
+                      <TableCell className="text-right">{u.total_readings}</TableCell>
+                      <TableCell className={`text-right font-medium ${u.total_readings ? pctColor(u.in_range_pct) : ""}`}>
+                        {u.total_readings ? `${u.in_range_pct}%` : "—"}
                       </TableCell>
-                      <TableCell className={`text-right font-medium ${pctColor(l.compliance_pct)}`}>
-                        {l.compliance_pct}%
+                      <TableCell className="text-right">{u.deviations}</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {temp(u.avg_temp_f)} / {temp(u.min_temp_f)} / {temp(u.max_temp_f)}
                       </TableCell>
-                      <TableCell className="text-right">{l.out_of_range}</TableCell>
-                      <TableCell className="text-right">
-                        {l.documented_deviations}/{l.deviations} documented
-                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">{fmtDate(u.last_reading_at)}</TableCell>
                     </TableRow>
                   ))}
-                  {data.locations.length === 0 && (
+                  {data.units.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="py-6 text-center text-sm text-muted-foreground">
-                        No locations yet.
+                      <TableCell colSpan={7} className="py-6 text-center text-sm text-muted-foreground">
+                        No units yet.
                       </TableCell>
                     </TableRow>
                   )}
@@ -124,7 +200,7 @@ export function AnalyticsPage() {
           </Card>
 
           <p className="text-xs text-muted-foreground">
-            Expected logs are estimated from each unit's logging interval; compliance is capped at 100%.
+            Compliance is the share of readings within each unit's safe range. Daily trend buckets are in UTC.
           </p>
         </>
       )}
