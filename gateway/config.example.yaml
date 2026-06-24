@@ -1,0 +1,25 @@
+# ChillCheck gateway config. Copy to config.yaml and edit.
+
+# Where the ChillCheck API lives.
+api_url: http://localhost:8080
+
+# The gateway key shown once when you create a gateway in the app.
+# You can leave this blank and set CHILLCHECK_GATEWAY_KEY in the environment instead.
+gateway_key: ""
+
+# How often to send one reading per sensor. Sensors broadcast every few seconds;
+# this throttles that down to a sane compliance cadence.
+sample_interval: 5m
+
+# Local store-and-forward buffer (survives internet outages).
+spool_path: ./chillcheck-spool.jsonl
+spool_max: 20000
+
+# Simulation mode: emit fake sensors instead of scanning Bluetooth. Great for
+# testing the pipeline end to end with no hardware. Bind these MACs to units in
+# the app to watch readings arrive.
+simulate: false
+simulate_macs:
+  - "A4:C1:38:00:00:01"
+  - "A4:C1:38:00:00:02"
+  - "A4:C1:38:00:00:03"

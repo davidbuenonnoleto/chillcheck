@@ -1,0 +1,37 @@
+# Secrets / local env (commit only the .env.example files)
+.env
+.env.local
+*.env
+!.env.example
+backend/.env
+frontend/.env
+gateway/config.yaml
+
+# Go
+*.exe
+*.test
+*.out
+/backend/api
+/backend/seed
+/gateway/gateway
+bin/
+
+# Node / frontend
+node_modules/
+dist/
+*.local
+.vite/
+
+# Editor / OS junk
+.DS_Store
+._*
+*.swp
+.idea/
+.vscode/
+
+# Gateway runtime spool (store-and-forward data)
+gateway/spool/
+*.spool
+
+# Logs
+*.log

@@ -1,0 +1,20 @@
+[Unit]
+Description=ChillCheck BLE gateway
+After=network-online.target bluetooth.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Adjust paths to where you install the binary and config.
+WorkingDirectory=/opt/chillcheck-gateway
+ExecStart=/opt/chillcheck-gateway/chillcheck-gateway --config /opt/chillcheck-gateway/config.yaml
+# Keep the key out of the config file if you prefer:
+# Environment=CHILLCHECK_GATEWAY_KEY=chk_gw_...
+Restart=always
+RestartSec=5
+# BLE scanning needs these capabilities (or run as root).
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+User=chillcheck
+
+[Install]
+WantedBy=multi-user.target

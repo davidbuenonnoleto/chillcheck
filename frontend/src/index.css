@@ -1,0 +1,114 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ChillCheck palette — HSL triplets consumed as hsl(var(--token)). Kept verbatim
+   from the Tailwind v3 theme so the bump to v4 changes tooling, not the design. */
+:root {
+  --background: 210 40% 99%;
+  --foreground: 215 28% 17%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 28% 17%;
+  --primary: 199 89% 38%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 205 30% 95%;
+  --secondary-foreground: 215 25% 27%;
+  --muted: 210 30% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 199 90% 95%;
+  --accent-foreground: 199 89% 28%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --ok: 152 56% 38%;
+  --ok-foreground: 0 0% 100%;
+  --warn: 33 95% 48%;
+  --warn-foreground: 0 0% 100%;
+  --border: 214 25% 90%;
+  --input: 214 25% 88%;
+  --ring: 199 89% 45%;
+  --chart-1: 199 89% 45%;
+  --chart-2: 152 56% 38%;
+  --chart-3: 33 95% 48%;
+  --chart-4: 262 60% 55%;
+  --chart-5: 340 70% 52%;
+  --radius: 0.6rem;
+}
+
+.dark {
+  --background: 215 35% 9%;
+  --foreground: 210 30% 92%;
+  --card: 215 32% 12%;
+  --card-foreground: 210 30% 92%;
+  --primary: 199 85% 52%;
+  --primary-foreground: 215 35% 9%;
+  --secondary: 215 25% 18%;
+  --secondary-foreground: 210 30% 92%;
+  --muted: 215 25% 16%;
+  --muted-foreground: 215 15% 65%;
+  --accent: 199 50% 20%;
+  --accent-foreground: 199 85% 80%;
+  --destructive: 0 63% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --ok: 152 50% 45%;
+  --ok-foreground: 0 0% 100%;
+  --warn: 33 90% 52%;
+  --warn-foreground: 215 35% 9%;
+  --border: 215 25% 22%;
+  --input: 215 25% 24%;
+  --ring: 199 85% 55%;
+  --chart-1: 199 85% 58%;
+  --chart-2: 152 55% 50%;
+  --chart-3: 33 90% 56%;
+  --chart-4: 262 70% 68%;
+  --chart-5: 340 75% 65%;
+  --radius: 0.6rem;
+}
+
+/* Map the palette to Tailwind v4 color tokens so bg-primary, text-ok, border-input,
+   ring-ring, bg-warn, etc. all resolve to the variables above. */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-ok: hsl(var(--ok));
+  --color-ok-foreground: hsl(var(--ok-foreground));
+  --color-warn: hsl(var(--warn));
+  --color-warn-foreground: hsl(var(--warn-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+
+@layer base {
+  /* Tailwind v4 defaults `border` color to currentColor; keep ChillCheck's token. */
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
