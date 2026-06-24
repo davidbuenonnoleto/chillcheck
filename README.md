@@ -35,13 +35,11 @@ psql "postgres://chillcheck:chillcheck@localhost:5432/chillcheck?sslmode=disable
 
 # 3. Backend  ->  http://localhost:8080
 cd backend
-cp .env.example .env
 go mod tidy
 go run ./cmd/api
 
 # 4. Frontend  ->  http://localhost:5173   (new terminal)
 cd frontend
-cp .env.example .env
 npm install
 npm run dev
 ```
@@ -49,6 +47,11 @@ npm run dev
 Open http://localhost:5173, create an account, add a location, add a unit
 (fridge / freezer / hot-hold), and start logging temperatures. "Export report"
 produces the compliance PDF.
+
+Config comes from environment variables with sensible local defaults — no setup
+needed to run as above. To override (DB URL, JWT secret, SMTP, Stripe, etc.), export
+the vars or use a tool like [direnv](https://direnv.net/); see `backend/.env.example`
+and `frontend/.env.example` for the full list.
 
 ### Run locally without Docker
 
@@ -62,12 +65,12 @@ unchanged:
 make pg-up
 
 # 3. Backend  ->  http://localhost:8080
-cd backend && cp .env.example .env && go mod tidy
+cd backend && go mod tidy
 DATABASE_URL="postgres://chillcheck:chillcheck@localhost:5433/chillcheck?sslmode=disable" \
   go run ./cmd/api
 
 # 4. Frontend  ->  http://localhost:5173   (new terminal, same as above)
-cd frontend && cp .env.example .env && npm install && npm run dev
+cd frontend && npm install && npm run dev
 ```
 
 Seed demo data the same way: `cd backend && DATABASE_URL="…localhost:5433…" go run ./cmd/seed`.

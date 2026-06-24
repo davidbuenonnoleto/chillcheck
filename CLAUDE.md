@@ -59,10 +59,10 @@ docker compose up -d
 psql "postgres://chillcheck:chillcheck@localhost:5432/chillcheck?sslmode=disable" -f backend/db/schema.sql
 
 # 3. Backend (http://localhost:8080)
-cd backend && cp .env.example .env && go mod tidy && go run ./cmd/api
+cd backend && go mod tidy && go run ./cmd/api   # config via env vars; local defaults work
 
 # 4. Frontend (http://localhost:5173)
-cd frontend && cp .env.example .env && npm install && npm run dev
+cd frontend && npm install && npm run dev
 ```
 
 ## Key decisions (don't silently reverse these)
