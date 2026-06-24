@@ -127,6 +127,29 @@ export interface LocationStatus {
   location: Location;
   units: UnitStatus[];
 }
+export interface LocationStat {
+  location_id: string;
+  location_name: string;
+  units: number;
+  readings: number;
+  expected_logs: number;
+  compliance_pct: number;
+  out_of_range: number;
+  deviations: number;
+  documented_deviations: number;
+}
+export interface Analytics {
+  from: string;
+  to: string;
+  locations: LocationStat[];
+  readings: number;
+  expected_logs: number;
+  compliance_pct: number;
+  out_of_range: number;
+  deviations: number;
+  documented_deviations: number;
+  documentation_pct: number;
+}
 
 // ---- core request helper ----
 
@@ -239,6 +262,14 @@ export const api = {
     request<{ ok: boolean }>("/api/auth/reset", { method: "POST", body: JSON.stringify({ token, password }) }),
 
   getIntegrity: () => request<ChainStatus>("/api/integrity"),
+
+  getAnalytics: (from?: string, to?: string) => {
+    const q = new URLSearchParams();
+    if (from) q.set("from", from);
+    if (to) q.set("to", to);
+    const qs = q.toString();
+    return request<Analytics>(`/api/analytics${qs ? `?${qs}` : ""}`);
+  },
 
   createReading: (body: { unit_id: string; temp_f: number; note?: string }) =>
     request<Reading>("/api/readings", { method: "POST", body: JSON.stringify(body) }),

@@ -92,6 +92,7 @@ func (s *Server) Router() http.Handler {
 
 			r.Get("/reports/compliance.pdf", s.handleComplianceReport)
 			r.Get("/integrity", s.handleIntegrity)
+			r.Get("/analytics", s.handleAnalytics)
 
 			// gateway + sensor administration (manager-facing)
 			r.Get("/locations/{id}/gateways", s.handleListGateways)

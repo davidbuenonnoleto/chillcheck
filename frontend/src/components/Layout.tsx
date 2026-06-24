@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { Snowflake, LogOut, CreditCard, Users } from "lucide-react";
+import { Snowflake, LogOut, CreditCard, Users, BarChart3 } from "lucide-react";
 import { useAuth } from "@/auth/AuthContext";
 import { Button } from "@/components/ui/button";
 import { BillingBanner } from "@/components/BillingBanner";
@@ -19,6 +19,12 @@ export function Layout({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3 text-sm">
             {orgName && <span className="hidden text-muted-foreground sm:inline">{orgName}</span>}
             {user && <span className="text-muted-foreground">{user.name}</span>}
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/analytics">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Analytics</span>
+              </Link>
+            </Button>
             <Button variant="ghost" size="sm" asChild>
               <Link to="/team">
                 <Users className="h-4 w-4" />

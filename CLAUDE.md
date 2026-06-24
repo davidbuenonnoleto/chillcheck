@@ -17,9 +17,10 @@ changing how the pieces fit together.
 
 - **Yolo mode.** Proceed without asking for confirmation on file edits, installs, builds,
   and local runs. Don't stop to ask permission for routine work.
-- **Not a git repo.** This project is local-only on this machine for now. Do **not** run
-  `git init`, commit, branch, or assume any version control exists. Don't suggest git
-  workflows unless asked. If you need a backup before a risky change, copy the file.
+- **Git repo.** Tracked with git and pushed to the private GitHub repo
+  `davidbuenonnoleto/chillcheck` (`origin`, SSH, default branch `main`). Commit and push
+  only when asked. Never commit secrets — `.env` files are gitignored; only `.env.example`
+  is tracked. End commit messages with the `Co-Authored-By` trailer.
 - Keep changes scoped and runnable. Prefer small, verifiable edits.
 
 ## Layout

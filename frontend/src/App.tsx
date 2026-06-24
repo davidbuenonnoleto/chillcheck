@@ -7,6 +7,7 @@ import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { LocationPage } from "@/pages/LocationPage";
 import { BillingPage } from "@/pages/BillingPage";
+import { AnalyticsPage } from "@/pages/AnalyticsPage";
 import { TeamPage } from "@/pages/TeamPage";
 import { AcceptInvitePage } from "@/pages/AcceptInvitePage";
 import { ForgotPasswordPage } from "@/pages/ForgotPasswordPage";
@@ -63,6 +64,14 @@ export default function App() {
               element={
                 <Protected>
                   <LocationPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <Protected>
+                  <AnalyticsPage />
                 </Protected>
               }
             />
