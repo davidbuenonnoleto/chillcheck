@@ -3,12 +3,11 @@
 Temperature / cold-chain compliance for restaurants. Replaces paper temp-log
 clipboards and produces inspection-ready PDF compliance reports.
 
-This is the full system (built through Weeks 1–7 plus a polish pass): accounts, locations,
-monitored units, manual logging, a live status board, and PDF export (1–3); an on-site
-Bluetooth **sensor gateway** for automatic readings and an **alert engine** for
-out-of-range / overdue notifications (4–6); and **Stripe billing** with per-location
-pricing, trials, and an onboarding checklist (7+). See `ARCHITECTURE.md` for how the
-pieces fit together.
+This is the full system: accounts, locations, monitored units, manual logging, a live
+status board, and PDF export; an on-site Bluetooth **sensor gateway** for automatic
+readings and an **alert engine** for out-of-range / overdue notifications; and **Stripe
+billing** with per-location pricing, trials, and an onboarding checklist. See
+`ARCHITECTURE.md` for how the pieces fit together.
 
 - **Backend:** Go (chi, pgx, JWT) with an in-process alert engine and Stripe billing — `backend/`
 - **Frontend:** React + TypeScript + Vite + Tailwind + shadcn/ui + TanStack Query — `frontend/`
@@ -161,11 +160,11 @@ managed by `make pg-up` / `make pg-down` / `make pg-nuke` and documented in
 - **Temperatures in Fahrenheit.** US restaurants and inspectors use °F; storing the
   recorded value verbatim avoids conversion error in a compliance record.
 - **`units`, not `sensors`.** A unit is monitored manually now and gets a Bluetooth
-  sensor attached in Weeks 4–6 without a schema change.
+  sensor attached later without a schema change.
 - **App Runner over Lambda** for the Go API — avoids the Lambda + Postgres
   connection-exhaustion trap. The `backend/Dockerfile` builds a small static image.
 
-## Bluetooth gateway (Weeks 4–6, included)
+## Bluetooth gateway (included)
 
 The `gateway/` directory is a standalone Go agent for a Raspberry Pi / mini-PC that
 listens to cheap BLE temperature sensors and forwards readings to the API, buffering

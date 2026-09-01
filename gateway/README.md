@@ -2,7 +2,7 @@
 
 A small Go agent that runs on-site (Raspberry Pi or any Linux mini-PC), listens
 to cheap Bluetooth temperature sensors broadcasting nearby, and forwards their
-readings to the ChillCheck API. It is the Weeks 4–6 piece that turns manual
+readings to the ChillCheck API. It is the piece that turns manual
 logging into automatic monitoring.
 
 Why a gateway at all: BLE sensors broadcast a few meters and have no internet

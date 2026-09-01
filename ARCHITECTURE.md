@@ -52,7 +52,7 @@ flowchart LR
 
 There are three flows worth understanding; everything else is CRUD.
 
-### 3a. Manual logging (the Weeks 1–3 core)
+### 3a. Manual logging (the core)
 
 Staff read a thermometer and type the value on a tablet.
 
@@ -63,7 +63,7 @@ tablet → React app → POST /api/readings (JWT) → store.CreateReading → re
 The dashboard reads `GET /api/locations/{id}/status`, which joins each unit to its latest
 reading and computes a status via `store.ComputeStatus`.
 
-### 3b. Sensor ingest (the Weeks 4–6 automation)
+### 3b. Sensor ingest (the automation layer)
 
 A BLE sensor in a fridge broadcasts its temperature every few seconds. It can't reach the
 internet, so the on-site gateway is the bridge:
